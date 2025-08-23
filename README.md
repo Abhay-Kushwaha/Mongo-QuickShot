@@ -1,14 +1,31 @@
 # Mongo-QuickShot
+
+### Import file in mongo
+- mongoimport <path> -d database -c collections --jsonArray --drop      // providing json array and drop the previous collection if created
+
 ### Create
 - use Database
-- db.coll **OR** db.createCollection("coll") **OR** db.coll.insertOne(obj)
 - show collections
+- db.coll **OR** db.createCollection("coll") **OR** db.coll.insertOne(obj)
+- Schema set
+```
+  db.createCollection("students", {validator:{
+      $jsonSchema:{
+          required:["name","age"],
+          properties:{
+              name:{bjonType:"string" , descriptioon: "must be string"},
+              age:{bjonType:"number" , descriptioon: "must be number"}
+          }
+      }
+  },
+  validationAction:'warn'})        // can be error by default
+```
 
 ### Read
 - db.coll.find()               // find few of top rows as array/list through which we can iterate
 - db.coll.findOne()            // gives top row
 - db.coll.findOne({'name':"Ram"})
-- db.coll.find({}, {title: 1, date: 1})                //second param called **projection** that is an object that describes which fields to include in the results.
+- db.coll.find({}, {name:1, _id:0})                //second param called **projection** that is an object that describes which fields to include in the results.
 - db.coll.find({}, {_id: 0, title: 1, date: 1})        // exclude the _id field.
 - db.coll.find({}, {category: 0})                      // everything except category
 ```
@@ -19,6 +36,7 @@ $gte:          Value is greater than or equal to another value
 $lt:           Value is less than another value
 $lte:          Value is less than or equal to another value
 $in:           Value is matched within an array
+$nin:          Value is matched that are NOT in array
 $and:          Returns documents where both queries match
 $or:           Returns documents where either query matches
 $nor:          Returns documents where both queries fail to match
@@ -47,7 +65,24 @@ $push:         Adds an element to an array
 - db.coll.insertMany([ { } , { } ])
 
 ### Update
-- db.coll.updateOne( { title: "1" }, { $set: { likes: 2 } } ) 
-- db.coll.updateMany( { }, { $set: {age:12} } ) 
+- db.coll.updateOne( { name: "Ravi" }, { $set:{age:22} } ) 
+- db.coll.updateMany( {age:13}, { $set: {age:12} } ) 
 - db.coll.updateMany( { }, { $set:{age:12} }, { upsert:true } ) // Update the document but insert it if not found
 - db.coll.updateMany( { }, { $inc: {age:12} })   // $inc (increment) operator:
+
+### Delete
+- db.coll.deleteOne({name:"Ravi"})
+- db.coll.deleteMany({age:13})
+- db.coll.deleteMany({})          // Empty the collections
+- db.dropDatabase()               // delete complete collection
+- db.coll.drop()                  // delete single collection
+
+### Additional
+- foundedOn: new Data()
+- Timestamp: new Timestamp()
+- typeof db.coll.findOne().name      // to check datatype
+- db.books.insertmany([{ },{ }] , {ordered:false})      // will continue after if error occured in mid
+- Write concern specification {w:<value>, j:<value>, wtimeout:<value>}  //w wait for acknowledgement, j forms the journal
+
+### Transaction
+- **Atomicity-** at document level
