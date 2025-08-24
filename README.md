@@ -35,14 +35,18 @@ $gt:           Value is greater than another value
 $gte:          Value is greater than or equal to another value
 $lt:           Value is less than another value
 $lte:          Value is less than or equal to another value
+$mod:          Performs modulo operation
 $in:           Value is matched within an array
 $nin:          Value is matched that are NOT in array
+$all:          Ignore order and find all
 $and:          Returns documents where both queries match
+$elemMatch:    match elements in array ($and do not check both condition in same array)
 $or:           Returns documents where either query matches
 $nor:          Returns documents where both queries fail to match
 $not:          Returns documents where the query does not match
-$regex:        Allows the use of regular expressions when evaluating field values
-$text:         Performs a text search
+$regex:        Allows the use of regular expressions when evaluating field values /* /
+$expr:         Allows aggregation expressions within query
+$text:         Performs a text search (only in text indexed, createIndexx({key:"text"}))
 $where:        Uses a JavaScript expression to match documents
 $currentDate:  Sets the field value to the current date
 $inc:          Increments the field value
@@ -53,6 +57,8 @@ $addToSet:     Adds distinct elements to an array
 $pop:          Removes the first or last element of an array
 $pull:         Removes all elements from an array that match the query
 $push:         Adds an element to an array
+$addToSet:     No redundency if the data already exists (better than push)
+$size:         To get the size of element selected in array
 ```
 - db.coll.find().count()
 - db.coll.find().limit(2)
@@ -69,6 +75,9 @@ $push:         Adds an element to an array
 - db.coll.updateMany( {age:13}, { $set: {age:12} } ) 
 - db.coll.updateMany( { }, { $set:{age:12} }, { upsert:true } ) // Update the document but insert it if not found
 - db.coll.updateMany( { }, { $inc: {age:12} })   // $inc (increment) operator:
+- db.coll.updateMany( {filter}, { $set:{ "arr.$.newfield": value} })   // add new field in first match inside an array object
+- db.coll.updateMany( {filter}, { $set:{ "arr.$[].newfield": value} })   // add new field in ALL MATCHES inside an array object
+- db.coll.updateMany( {filter}, { $set:{ "arr.$[e].newfield": value} } , {arrayFilter:[{ "e.age":{$lt:10} }]} )   // add new field in ALL MATCHES over certain condition inside an array object
 
 ### Delete
 - db.coll.deleteOne({name:"Ravi"})
@@ -83,6 +92,17 @@ $push:         Adds an element to an array
 - typeof db.coll.findOne().name      // to check datatype
 - db.books.insertmany([{ },{ }] , {ordered:false})      // will continue after if error occured in mid
 - Write concern specification {w:<value>, j:<value>, wtimeout:<value>}  //w wait for acknowledgement, j forms the journal
+- db.coll.find({hasAadhar: {$exists:true, $type:'number' }})          // check if somthing exists
+- db.coll.find().sort({age:1, name:1})         // First by age and then by name
+- db.coll.find().sort({age:-1})                // descending
+- db.coll.find().sort({age:-1}).skip(5)        // descending and skip top 5
+```
+$min: db.coll.updateOne({name:"Sita"} , {$max:{age:20}})  // set 20 if her age is less than 20
+$max: db.coll.updateOne({name:"Sita"} , {$min:{age:15}})  // set 15 if her age is greater than 15
+$inc: db.coll.updateMany({ } , {$inc: {age+1} })
+$mul: db.coll.updateOne({name:"Sita"} , {$mul: {age:2} })     // multiply by 2
+$unset: to remove some field
+```
 
 ### Transaction
 - **Atomicity-** at document level
