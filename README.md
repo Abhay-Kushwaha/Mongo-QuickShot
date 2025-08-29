@@ -1,9 +1,9 @@
 # Mongo-QuickShot
 
-### Import file in mongo
+## Import file in mongo
 - mongoimport <path> -d database -c collections --jsonArray --drop      // providing json array and drop the previous collection if created
 
-### Create
+## Create
 - use Database
 - show collections
 - db.coll **OR** db.createCollection("coll") **OR** db.coll.insertOne(obj)
@@ -21,7 +21,7 @@
   validationAction:'warn'})        // can be error by default
 ```
 
-### Read
+## Read
 - db.coll.find()               // find few of top rows as array/list through which we can iterate
 - db.coll.findOne()            // gives top row
 - db.coll.findOne({'name':"Ram"})
@@ -65,12 +65,12 @@ $size:         To get the size of element selected in array
 - db.coll.find().forEach((x)=>{printjson(x)})
 - db.coll.find().toArray()
 
-### Create
+## Create
 - db.coll.insert()      // old version, not used currenntly
 - db.coll.insertOne({ })
 - db.coll.insertMany([ { } , { } ])
 
-### Update
+## Update
 - db.coll.updateOne( { name: "Ravi" }, { $set:{age:22} } ) 
 - db.coll.updateMany( {age:13}, { $set: {age:12} } ) 
 - db.coll.updateMany( { }, { $set:{age:12} }, { upsert:true } ) // Update the document but insert it if not found
@@ -86,7 +86,7 @@ $size:         To get the size of element selected in array
     )             // add new field in ALL MATCHES over certain condition inside an array object
 ```
 
-### Delete
+## Delete
 - db.coll.deleteOne({name:"Ravi"})
 - db.coll.deleteMany({age:13})
 - db.coll.deleteMany({})          // Empty the collections
@@ -106,10 +106,15 @@ $size:         To get the size of element selected in array
 - db.coll.getIndexes()                         // show indexing
 - db.coll.dropIndex({name:1})                  // deleting indexing in name
 
-### Transaction
+## Transaction
 - **Atomicity-** at document level
 
-### Additional
+## Aggregation Pipelines
+- db.coll.aggregate([{$match:{gender:male}}])          // Get all males
+- db.coll.aggregate([{$group:{_id:'$age'}}])          // Group by age
+- db.coll.aggregate([ {$group:{_id:'$age'} , names:{$push:$"name"}} ])          // Group by age and show with names
+
+## Additional
 - foundedOn: new Data()
 - Timestamp: new Timestamp()
 - typeof db.coll.findOne().name      // to check datatype
