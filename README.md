@@ -13,8 +13,8 @@
       $jsonSchema:{
           required:["name","age"],
           properties:{
-              name:{bjonType:"string" , descriptioon: "must be string"},
-              age:{bjonType:"number" , descriptioon: "must be number"}
+              name:{bjsonType:"string" , description: "must be string"},
+              age:{bjsonType:"number" , description: "must be number"}
           }
       }
   },
@@ -76,8 +76,15 @@ $size:         To get the size of element selected in array
 - db.coll.updateMany( { }, { $set:{age:12} }, { upsert:true } ) // Update the document but insert it if not found
 - db.coll.updateMany( { }, { $inc: {age:12} })   // $inc (increment) operator:
 - db.coll.updateMany( {filter}, { $set:{ "arr.$.newfield": value} })   // add new field in first match inside an array object
-- db.coll.updateMany( {filter}, { $set:{ "arr.$[].newfield": value} })   // add new field in ALL MATCHES inside an array object
-- db.coll.updateMany( {filter}, { $set:{ "arr.$[e].newfield": value} } , {arrayFilter:[{ "e.age":{$lt:10} }]} )   // add new field in ALL MATCHES over certain condition inside an array object
+```
+>>> db.coll.updateMany( {filter},
+    { $set: { "arr.$[].newfield": value } }
+    )             // add new field in ALL MATCHES inside an array object
+>>> db.coll.updateMany( {filter},
+    { $set: { "arr.$[e].newfield": value } },
+    { arrayFilters: [ { "e.age": { $lt: 10 } } ] }
+    )             // add new field in ALL MATCHES over certain condition inside an array object
+```
 
 ### Delete
 - db.coll.deleteOne({name:"Ravi"})
@@ -85,6 +92,22 @@ $size:         To get the size of element selected in array
 - db.coll.deleteMany({})          // Empty the collections
 - db.dropDatabase()               // delete complete collection
 - db.coll.drop()                  // delete single collection
+
+## Indexing
+- db.coll.createIndex({name:1})                // indexing in name to search fast (use -1 for descending)
+- db.coll.createIndex({name:1}, {expireAfterSeconds: 3600})                // indexing expire after 1 hr, on date and single field index
+- **Covered Query** serach in BTREE if indexing is done so it takes less time
+- In multiple indexes on same field, it searches on best one by running and testing on some sample cases
+- **Multi Key Index** indexing on array, created for each element so consume a lot of space
+- db.coll.createIndex({name:1,bio:1}, {weights:{name:10,bio:5}})                // indexing on multiple field index with priority using weights
+- **Text Index** only one text index per collection (can add mutiple fields like "name" and "bio" together)
+- db.coll.find({$text:{$search:"Youtube"}})
+- db.coll.find({$text:{$search:"Youtube"}}, {Score:{$meta:"textScore"}})        // Gives the score acording to which text indexing is segregated for output
+- db.coll.getIndexes()                         // show indexing
+- db.coll.dropIndex({name:1})                  // deleting indexing in name
+
+### Transaction
+- **Atomicity-** at document level
 
 ### Additional
 - foundedOn: new Data()
@@ -103,6 +126,3 @@ $inc: db.coll.updateMany({ } , {$inc: {age+1} })
 $mul: db.coll.updateOne({name:"Sita"} , {$mul: {age:2} })     // multiply by 2
 $unset: to remove some field
 ```
-
-### Transaction
-- **Atomicity-** at document level
